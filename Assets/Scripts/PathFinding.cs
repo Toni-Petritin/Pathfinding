@@ -1,12 +1,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-using Unity.PlasticSCM.Editor.WebApi;
 
 public class PathFinding : MonoBehaviour
 {
-    public const int width = 20;
-    public const int height = 20;
+    private enum Metric
+    {
+        Manhattan = 0,
+        Euclidean = 1,
+        Diagonal = 2
+    }
+
+    [SerializeField] private Metric AStarMetric;
+    
+    private const int width = 20;
+    private const int height = 20;
 
     public int Width { get; private set; }
     public int Height { get; private set; }
@@ -17,22 +25,22 @@ public class PathFinding : MonoBehaviour
     public int endX = 18;
     public int endY = 17;
 
-    private const float padding = .1f;
+    private const float Padding = .1f;
 
     [SerializeField] private float stepInterval = .1f;
-    private float timer = 0;
-    private bool path_finished = false;
+    private float _timer;
+    private bool _pathFinished;
     public bool paused = true;
 
-    [SerializeField] private GameObject tileobject;
+    [SerializeField] private GameObject tileObject;
 
     GameObject[,] _tiles = new GameObject[width, height];
 
-    // List for "unvisited" nodes.
-    List<Tile> unvisited = new();
+    // List for "open" nodes.
+    List<Tile> _unvisited = new();
     // List for "closed" nodes.
-    List<Tile> visited = new();
-    Tile current;
+    List<Tile> _visited = new();
+    Tile _current;
 
     private void Awake()
     {
@@ -43,7 +51,7 @@ public class PathFinding : MonoBehaviour
         {
             for( int y = 0; y < height; y++)
             {
-                _tiles[x, y] = Instantiate(tileobject, new Vector3(x * (tileobject.transform.localScale.x + padding), 0, y * (tileobject.transform.localScale.y + padding)), tileobject.transform.rotation);
+                _tiles[x, y] = Instantiate(tileObject, new Vector3(x * (tileObject.transform.localScale.x + Padding), 0, y * (tileObject.transform.localScale.y + Padding)), tileObject.transform.rotation);
                 _tiles[x, y].GetComponent<Tile>().x = x;
                 _tiles[x, y].GetComponent<Tile>().y = y;
             }
@@ -57,13 +65,13 @@ public class PathFinding : MonoBehaviour
 
         InitDisjkstra();
 
-        _tiles[3, 5].GetComponent<Tile>().is_traversable = false;
-        _tiles[4, 4].GetComponent<Tile>().is_traversable = false;
-        _tiles[4, 5].GetComponent<Tile>().is_traversable = false;
+        _tiles[3, 5].GetComponent<Tile>().isTraversable = false;
+        _tiles[4, 4].GetComponent<Tile>().isTraversable = false;
+        _tiles[4, 5].GetComponent<Tile>().isTraversable = false;
 
         foreach (GameObject tile in _tiles)
         {
-            if (!tile.GetComponent<Tile>().is_traversable)
+            if (!tile.GetComponent<Tile>().isTraversable)
             {
                 tile.GetComponent<MeshRenderer>().material.color = Color.black;
                 tile.GetComponent<Tile>().costField.text = "";
@@ -82,16 +90,16 @@ public class PathFinding : MonoBehaviour
 
         if (!paused)
         {
-            timer += Time.deltaTime;
+            _timer += Time.deltaTime;
         }
 
-        if (timer >= stepInterval)
+        if (_timer >= stepInterval)
         {
-            path_finished = StepDisjkstra();
-            timer = 0;
+            _pathFinished = StepDisjkstra();
+            _timer = 0;
         }
 
-        if (path_finished)
+        if (_pathFinished)
         {
             BackTrackRoute();
             this.enabled = false;
@@ -103,20 +111,20 @@ public class PathFinding : MonoBehaviour
         // Set the start tile cost to 0.
         _tiles[startX, startY].GetComponent<Tile>().cost = 0;
 
-        unvisited.Clear();
+        _unvisited.Clear();
 
         // Populate the list.
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
             {
-                unvisited.Add(_tiles[x, y].GetComponent<Tile>());
+                _unvisited.Add(_tiles[x, y].GetComponent<Tile>());
             }
         }
 
-        visited.Clear();
+        _visited.Clear();
 
-        current = unvisited.Find( t => t.x == startX && t.y == startY);
+        _current = _unvisited.Find( t => t.x == startX && t.y == startY);
     }
 
     private bool StepDisjkstra()
@@ -129,15 +137,15 @@ public class PathFinding : MonoBehaviour
                 if (i == 0 && j == 0)
                     continue;
 
-                Tile neighbour = unvisited.Find(t => t.x == current.x + i && t.y == current.y + j);
+                Tile neighbour = _unvisited.Find(t => t.x == _current.x + i && t.y == _current.y + j);
 
-                if (neighbour == null || !neighbour.is_traversable)
+                if (neighbour == null || !neighbour.isTraversable)
                     continue;
                 if (!(neighbour.x == endX && neighbour.y == endY))
                     neighbour.GetComponent<MeshRenderer>().material.color = Color.gray;
 
                 // Compute the cost
-                float cost = current.cost;
+                float cost = _current.cost;
                 if(i == 0 || j == 0)
                     cost += 10;
                 else
@@ -149,26 +157,26 @@ public class PathFinding : MonoBehaviour
                 {
                     neighbour.cost = cost;
                     neighbour.costField.text = cost.ToString();
-                    neighbour.SetPrev(current.x, current.y);
+                    neighbour.prevX = _current.x;
+                    neighbour.prevY = _current.y;
                 }
             }
         }
 
         // Remove from unvisited and add to visited
-        unvisited.Remove(current);
-        visited.Add(current);
-        if(!(current.x == startX && current.y == startY))
+        _unvisited.Remove(_current);
+        _visited.Add(_current);
+        if(!(_current.x == startX && _current.y == startY))
         {
-            current.GetComponent<MeshRenderer>().material.color = Color.magenta;
+            _current.GetComponent<MeshRenderer>().material.color = Color.magenta;
         }
 
         // Update neighbour cost (if lower).
-        float mincost = unvisited.Min(t => t.cost);
-        current = unvisited.Find(t => t.cost == mincost);
-        Debug.Log("Min cost: " + mincost);
+        float mincost = _unvisited.Min(t => t.cost);
+        _current = _unvisited.Find(t => t.cost == mincost);
 
         // Check if we're at the end.
-        if ((current.x == endX && current.y == endY) || unvisited.Count == 0)
+        if ((_current.x == endX && _current.y == endY) || _unvisited.Count == 0)
             return true;
         else
             return false;
@@ -181,11 +189,9 @@ public class PathFinding : MonoBehaviour
         while (!(t.x == startX && t.y == startY))
         {
             if(!(t.x == endX && t.y == endY))
-            t.GetComponent<MeshRenderer>().material.color = Color.yellow;
-
-            t = _tiles[t.GetPrevX(), t.GetPrevY()].GetComponent<Tile>();
+                t.GetComponent<MeshRenderer>().material.color = Color.yellow;
+            
+            t = _tiles[t.prevX, t.prevY].GetComponent<Tile>();
         }
-        
     }
-
 }
