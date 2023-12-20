@@ -9,9 +9,9 @@ public class PathFinding : MonoBehaviour
         Manhattan = 0,
         Euclidean = 1,
         Diagonal = 2
-    }
-
-    [SerializeField] private Metric AStarMetric;
+    } 
+    
+    [SerializeField] private Metric aStarMetric;
     
     private const int width = 20;
     private const int height = 20;
@@ -27,11 +27,12 @@ public class PathFinding : MonoBehaviour
 
     private const float Padding = .1f;
 
+    // Time handling.
     [SerializeField] private float stepInterval = .1f;
     private float _timer;
     private bool _pathFinished;
     public bool paused = true;
-
+    
     [SerializeField] private GameObject tileObject;
 
     GameObject[,] _tiles = new GameObject[width, height];
@@ -61,24 +62,11 @@ public class PathFinding : MonoBehaviour
     private void Start()
     {
         _tiles[startX, startY].GetComponent<MeshRenderer>().material.color = Color.red;
+        _tiles[startX, startY].GetComponent<Tile>().unTouchable = true;
         _tiles[endX, endY].GetComponent<MeshRenderer>().material.color = Color.blue;
+        _tiles[endX, endY].GetComponent<Tile>().unTouchable = true;
 
         InitDisjkstra();
-
-        _tiles[3, 5].GetComponent<Tile>().isTraversable = false;
-        _tiles[4, 4].GetComponent<Tile>().isTraversable = false;
-        _tiles[4, 5].GetComponent<Tile>().isTraversable = false;
-
-        foreach (GameObject tile in _tiles)
-        {
-            if (!tile.GetComponent<Tile>().isTraversable)
-            {
-                tile.GetComponent<MeshRenderer>().material.color = Color.black;
-                tile.GetComponent<Tile>().costField.text = "";
-                tile.GetComponent<Tile>().leftField.text = "";
-                tile.GetComponent<Tile>().rightField.text = "";
-            }
-        }
     }
 
     private void Update()
