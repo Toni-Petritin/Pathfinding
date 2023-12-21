@@ -185,7 +185,7 @@ MonoBehaviour:
   startY: 1
   endX: 18
   endY: 17
-  stepInterval: 0.02
+  stepInterval: 0.04
   paused: 1
   tileObject: {fileID: 4137230946357878063, guid: 5429fe8074f8cd64f80c4448a76957d3, type: 3}
 --- !u!1 &2086633492

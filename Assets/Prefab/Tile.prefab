@@ -528,8 +528,8 @@ MonoBehaviour:
   unTouchable: 0
   Parent: {fileID: 0}
   sumCostField: {fileID: 4161105657191285734}
-  CostField: {fileID: 5595205364969786125}
-  DistanceField: {fileID: 8147600374298956465}
+  costField: {fileID: 5595205364969786125}
+  distanceField: {fileID: 8147600374298956465}
 --- !u!1 &4333140925202272703
 GameObject:
   m_ObjectHideFlags: 0

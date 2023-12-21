@@ -9,14 +9,20 @@ public class AStar : MonoBehaviour
         Manhattan = 0,
         Euclidean = 1,
         Diagonal = 2,
-        Dijkstra = 3
+        Dijkstra = 3,
+        Projection = 4,
+        SoftManh = 5,
+        HardEuclid = 6
     } 
     
+    // Allows testing with different types of metrics.
     [SerializeField] private Metric aStarMetric;
     
     private const int width = 20;
     private const int height = 20;
     
+    // These exist because CameraLocator-script needs the values and you can't pass
+    // a reference to const variables.
     public int Width { get; private set; }
     public int Height { get; private set; }
 
@@ -56,12 +62,18 @@ public class AStar : MonoBehaviour
                 GameObject temp =Instantiate(tileObject,
                     new Vector3(x * (tileObject.transform.localScale.x + Padding), 0, y * (tileObject.transform.localScale.y + Padding)),
                     tileObject.transform.rotation);
+                // I didn't want to go looking for the Tile-component all the time.
+                // So, I changed the tiles to be Tile type here.
                 _tiles[x, y] = temp.GetComponent<Tile>();
                 _tiles[x, y].x = x;
                 _tiles[x, y].y = y;
+                
+                // I'm setting the borders non-traversable. This way we don't need to check
+                // if we are going out of bounds.
                 if (x == 0 || y == 0 || x == width - 1 || y == height - 1)
                 {
                     _tiles[x,y].SetTraversable(false);
+                    _tiles[x, y].unTouchable = true;
                 }
             }
         }
@@ -69,6 +81,7 @@ public class AStar : MonoBehaviour
 
     private void Start()
     {
+        // Start and end visuals.
         _tiles[startX, startY].GetComponent<MeshRenderer>().material.color = Color.red;
         _tiles[startX, startY].GetComponent<Tile>().unTouchable = true;
         _tiles[endX, endY].GetComponent<MeshRenderer>().material.color = Color.blue;
@@ -79,6 +92,7 @@ public class AStar : MonoBehaviour
 
     private void Update()
     {
+        // Pause and unpause simulation.
         if (Input.GetKeyDown(KeyCode.Space))
         {
             paused = !paused;
@@ -89,12 +103,15 @@ public class AStar : MonoBehaviour
             _timer += Time.deltaTime;
         }
 
+        // Technically we only need to check if _open.Count == 0, but we had the
+        // _pathFinished in class so... shrug.
         if (_pathFinished || _open.Count==0)
         {
             BackTrackRoute();
             this.enabled = false;
         }
         
+        // Do single loop with each stepInterval.
         if (_timer >= stepInterval)
         {
             _pathFinished = StepAStar();
@@ -108,13 +125,14 @@ public class AStar : MonoBehaviour
         // Set the start tile cost to 0.
         _current.SetSumCost(0);
 
+        // Guess technically this is the only mandatory step in here anymore, but why not.
         _open.Add(_current);
     }
 
     private bool StepAStar()
     {
-        
-        float mincost = _open.Min(t => t.SumCost);
+        // Find cheapest node in the open list.
+        int mincost = _open.Min(t => t.SumCost);
         _current = _open.Find(t => t.SumCost == mincost);
 
         _open.Remove(_current);
@@ -125,34 +143,49 @@ public class AStar : MonoBehaviour
             return true;
         }
         
+        // This is basically keeping track of the closed list. It will only leave out
+        // start and end points.
         if(!_current.unTouchable)
         {
             _current.GetComponent<MeshRenderer>().material.color = Color.magenta;
         }
         
-        // Go through neighbours
+        // Go through neighbours of _current tile.
         for(int i = -1; i<= 1; i++)
         {
             for (int j = -1; j <= 1; j++)
             {
+                // Skip self.
                 if (i == 0 && j == 0)
                     continue;
                 
                 Tile neighbour = _tiles[_current.x + i, _current.y + j];
+                // Skip every tile we know already.
                 if (neighbour.isTraversable && !_closed.Contains(neighbour))
                 {
+                    // Need temporary values as we don't yet know, if we are on the right path.
+                    int tempCost = _current.Cost;
                     if (i == 0 || j == 0)
-                        neighbour.SetCost(_current.Cost + 10);
+                        tempCost += 10;
                     else
-                        neighbour.SetCost(_current.Cost + 14);
+                        tempCost += 14;
                     
+                    // Distance never changes. We can update it directly.
                     neighbour.SetDistance(DistanceToEnd(neighbour.x, neighbour.y));
-                    int tempSumCost = neighbour.Cost + neighbour.Distance;
+                    
+                    // Same here. No permanent changes yet.
+                    int tempSumCost = tempCost + neighbour.Distance;
                     bool inOpen = _open.Contains(neighbour);
                     
+                    // Nested if-statements... :C
+                    // Technically I don't need to check the !isOpen condition here, but
+                    // since I do need it for the second if-statement might as well.
                     if (tempSumCost < neighbour.SumCost || !inOpen)
                     {
+                        // We can now overwrite the previous costs.
+                        neighbour.SetCost(tempCost);
                         neighbour.SetSumCost(tempSumCost);
+                        // We now know _current has a new Parent.
                         neighbour.Parent = _current;
                         if (!inOpen)
                         {
@@ -164,55 +197,15 @@ public class AStar : MonoBehaviour
                         }
                     }
                 }
-                
-                // Tile neighbour = _open.Find(t => t.x == _current.x + i && t.y == _current.y + j);
-                //
-                // if (neighbour == null || !neighbour.isTraversable)
-                //     continue;
-                // if (!(neighbour.x == endX && neighbour.y == endY))
-                //     neighbour.GetComponent<MeshRenderer>().material.color = Color.gray;
-                //
-                // // Compute the cost
-                // int cost = _current.SumCost;
-                // float toEndCost = DistanceToEnd(neighbour.x, neighbour.y);
-                // float sumCost = cost + toEndCost;
-                // if (i == 0 || j == 0)
-                //     cost += 10;
-                // else
-                //     cost += 14;
-                //
-                // // Update neighbour cost
-                // if (cost < neighbour.SumCost)
-                // {
-                //     neighbour.SetSumCost(cost);
-                //     // neighbour.parentX = _current.x;
-                //     // neighbour.parentY = _current.y;
-                // }
             }
         }
 
-        // Remove from unvisited and add to visited
-        // _open.Remove(_current);
-        // _closed.Add(_current);
-        // if(!(_current.x == startX && _current.y == startY))
-        // {
-        //     _current.GetComponent<MeshRenderer>().material.color = Color.magenta;
-        // }
-
-        // // Update neighbour cost (if lower).
-        // float mincost = _open.Min(t => t.SumCost);
-        // _current = _open.Find(t => t.SumCost == mincost);
-
-        // Check if we're at the end.
-        // if ((_current.x == endX && _current.y == endY) || _open.Count == 0)
-        //     return true;
-        // else
-        //     return false;
         return false;
     }
 
     private void BackTrackRoute()
     {
+        // Go through the Parent chain until we get back to start.
         Tile t = _tiles[endX, endY];
         while (t.x != startX || t.y != startY)
         {
@@ -234,9 +227,15 @@ public class AStar : MonoBehaviour
             case Metric.Euclidean:
                 return (int)Mathf.Sqrt(x*x + y*y) * 10;
             case Metric.Diagonal:
-                return Mathf.Max(x, y) * 14 + Mathf.Abs(x-y) * 10;
+                return Mathf.Min(x, y) * 14 + Mathf.Abs(x-y) * 10;
             case Metric.Dijkstra:
                 return 0;
+            case Metric.Projection:
+                return Mathf.Max(x, y) * 10;
+            case Metric.SoftManh:
+                return (x + y) * 8;
+            case Metric.HardEuclid:
+                return (int)Mathf.Sqrt(x*x + y*y) * 12;
             default:
                 // Defaults to Dijkstra.
                 return 0;
