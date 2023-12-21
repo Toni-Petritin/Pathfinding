@@ -178,8 +178,7 @@ public class AStar : MonoBehaviour
                     bool inOpen = _open.Contains(neighbour);
                     
                     // Nested if-statements... :C
-                    // Technically I don't need to check the !isOpen condition here, but
-                    // since I do need it for the second if-statement might as well.
+                    // Check if temp value is better than before.
                     if (tempSumCost < neighbour.SumCost || !inOpen)
                     {
                         // We can now overwrite the previous costs.
@@ -235,6 +234,7 @@ public class AStar : MonoBehaviour
             case Metric.SoftManh:
                 return (x + y) * 8;
             case Metric.HardEuclid:
+                // This exists purely as a way to create a more natural (non-optimal) path.
                 return (int)Mathf.Sqrt(x*x + y*y) * 12;
             default:
                 // Defaults to Dijkstra.
