@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2342937125530287308}
   - component: {fileID: 5595205364969786125}
   m_Layer: 5
-  m_Name: LeftField
+  m_Name: CostField
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -34,8 +34,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -120, y: 160}
-  m_SizeDelta: {x: 60, y: 50}
+  m_AnchoredPosition: {x: -110, y: 160}
+  m_SizeDelta: {x: 70, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2342937125530287308
 CanvasRenderer:
@@ -74,8 +74,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -146,7 +146,7 @@ GameObject:
   - component: {fileID: 2008011503352821711}
   - component: {fileID: 8147600374298956465}
   m_Layer: 5
-  m_Name: RightField
+  m_Name: DistanceField
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -168,8 +168,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 120, y: 160}
-  m_SizeDelta: {x: 60, y: 50}
+  m_AnchoredPosition: {x: 110, y: 160}
+  m_SizeDelta: {x: 70, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2008011503352821711
 CanvasRenderer:
@@ -208,8 +208,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -280,7 +280,7 @@ GameObject:
   - component: {fileID: 405958568642144398}
   - component: {fileID: 4161105657191285734}
   m_Layer: 5
-  m_Name: CostField
+  m_Name: SumCostField
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -302,7 +302,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -100}
+  m_AnchoredPosition: {x: 0, y: -200}
   m_SizeDelta: {x: 100, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &405958568642144398
@@ -342,8 +342,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -360,8 +360,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 28
+  m_fontSizeBase: 28
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -524,14 +524,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   x: 0
   y: 0
-  is_traversable: 1
-  cost: 3.4028235e+38
-  weight: 1
-  prev_x: 0
-  prev_y: 0
-  costField: {fileID: 4161105657191285734}
-  leftField: {fileID: 5595205364969786125}
-  rightField: {fileID: 8147600374298956465}
+  isTraversable: 1
+  unTouchable: 0
+  Parent: {fileID: 0}
+  sumCostField: {fileID: 4161105657191285734}
+  CostField: {fileID: 5595205364969786125}
+  DistanceField: {fileID: 8147600374298956465}
 --- !u!1 &4333140925202272703
 GameObject:
   m_ObjectHideFlags: 0
@@ -563,9 +561,9 @@ RectTransform:
   m_LocalScale: {x: 0.002, y: 0.002, z: 0.002}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 7030600926378773776}
   - {fileID: 1293876089472334569}
   - {fileID: 1775656824373535976}
-  - {fileID: 7030600926378773776}
   m_Father: {fileID: 691809275131237012}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}

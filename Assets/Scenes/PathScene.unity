@@ -132,7 +132,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 393219853}
-  - component: {fileID: 393219852}
+  - component: {fileID: 393219855}
   - component: {fileID: 393219854}
   m_Layer: 0
   m_Name: Grid
@@ -141,26 +141,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &393219852
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 393219851}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 139e1e45dd0af244e92cf84b56fc88ae, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  aStarMetric: 0
-  startX: 1
-  startY: 1
-  endX: 11
-  endY: 15
-  stepInterval: 0.02
-  paused: 1
-  tileObject: {fileID: 4137230946357878063, guid: 5429fe8074f8cd64f80c4448a76957d3, type: 3}
 --- !u!4 &393219853
 Transform:
   m_ObjectHideFlags: 0
@@ -188,6 +168,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 340c48cffeeb56940ac72bcc73e4ad67, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &393219855
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 393219851}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8068f1d35b0158b4b94d2aae37c2aa84, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  aStarMetric: 0
+  startX: 1
+  startY: 1
+  endX: 18
+  endY: 17
+  stepInterval: 0.02
+  paused: 1
+  tileObject: {fileID: 4137230946357878063, guid: 5429fe8074f8cd64f80c4448a76957d3, type: 3}
 --- !u!1 &2086633492
 GameObject:
   m_ObjectHideFlags: 0
@@ -293,7 +293,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cda4040a9c3754e41b7a64b2ee1c4f69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  center: {fileID: 393219852}
+  center: {fileID: 393219855}
 --- !u!1 &2115146239
 GameObject:
   m_ObjectHideFlags: 0

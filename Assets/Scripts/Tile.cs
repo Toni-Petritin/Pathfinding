@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class Tile : MonoBehaviour
 {
@@ -8,28 +9,46 @@ public class Tile : MonoBehaviour
 
     public bool isTraversable = true;
     public bool unTouchable;
-
     
-    // Set to maximum value.
-    public float cost = float.MaxValue;
-    public float weight = 1;
+    public int Cost { get; private set; }
+    public int Distance { get; private set; }
+    public int SumCost { get; private set; } = int.MaxValue;
+    //public int weight = 1;
 
-    public int prevX;
-    public int prevY;
+    // public int parentX;
+    // public int parentY;
+    public Tile Parent;
 
-    public TextMeshProUGUI costField;
-    public TextMeshProUGUI leftField;
-    public TextMeshProUGUI rightField;
+    [SerializeField]private TextMeshProUGUI sumCostField;
+    [SerializeField]private TextMeshProUGUI CostField;
+    [SerializeField]private TextMeshProUGUI DistanceField;
 
     public void SetTraversable(bool onOff)
     {
         isTraversable = onOff;
         if (!onOff && !unTouchable)
         {
-            this.GetComponent<MeshRenderer>().material.color = Color.black;
-            costField.text = "";
-            leftField.text = "";
-            rightField.text = "";
+            GetComponent<MeshRenderer>().material.color = Color.black;
+            sumCostField.enabled = false;
+            CostField.enabled = false;
+            DistanceField.enabled = false;
         }
+    }
+
+    public void SetCost(int value)
+    {
+        Cost = value;
+        CostField.text = Cost.ToString();
+    }
+    
+    public void SetDistance(int value)
+    {
+        Distance = value;
+        DistanceField.text = Distance.ToString();
+    }
+    public void SetSumCost(int value)
+    {
+        SumCost = value;
+        sumCostField.text = SumCost.ToString();
     }
 }

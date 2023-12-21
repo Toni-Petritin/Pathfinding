@@ -1,13 +1,14 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraLocator : MonoBehaviour
 {
-    [SerializeField] private PathFinding center;
+    [SerializeField] private AStar center;
 
     private void Start()
     {
-        transform.position = new Vector3(center.Width / 2, Mathf.Max(center.Width, center.Height), center.Height / 2);
+        transform.position =
+            new Vector3(((float)center.Width + 1) / 2,
+                Mathf.Max(center.Width, center.Height),
+                ((float)center.Height + 1) / 2);
     }
 }
